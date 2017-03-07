@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="dcastalia.com.munshijobsportal">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <provider
+        android:name=".ContentProvider.MyFileContentProvider"
+        android:authorities="com.dcastalia.android.job_portal"
+        android:enabled="true"
+        android:exported="true" />
+
+    <application
+        android:name=".Controller.AppController"
+        android:allowBackup="true"
+        android:icon="@drawable/app_logo"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".activity.SplashActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:label="Registration" />
+        <activity android:name=".activity.MainActivity" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="Login" />
+        <activity
+            android:name=".activity.ForgotPasswordActivity"
+            android:parentActivityName=".activity.LoginActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".LoginActivity" />
+        </activity>
+        <activity
+            android:name=".activity.EditProfileActivity"
+            android:label=" Edit Profile"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:label="Profile"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.JobOpeningActivity"
+            android:label="Job Opening"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.MyJobActivity"
+            android:label="My Jobs"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.FavouriteActivity"
+            android:label="My Favorite Jobs "
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.HelpActivity"
+            android:label="Help"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.SettingActivity"
+            android:label="Setting"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.JobDetailsActivity"
+            android:label="Job Details"
+            android:parentActivityName=".activity.JobOpeningActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".JobOpeningActivity" />
+        </activity>
+        <activity
+            android:name=".activity.JobSearchActivity"
+            android:label="Job Search "
+            android:parentActivityName=".activity.JobOpeningActivity">
+            <meta-data
+                android:name="android:support:PARENT_ACTIVITY"
+                android:value=".JobOpeningActivity" />
+        </activity>
+        <activity
+            android:name=".activity.ResetPasswordActivity"
+            android:label="Reset Password"
+            android:parentActivityName=".activity.LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTVITY"
+                android:value=".LoginActivity" />
+        </activity>
+        <activity android:name=".activity.JobSearchShowActivity"></activity>
+    </application>
+
+</manifest>

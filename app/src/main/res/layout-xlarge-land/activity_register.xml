@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_register"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.RegisterActivity">
+
+    <FrameLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_container">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#333333"
+            tools:context="com.dcastalia.android.job_portal.Activity.MainActivity">
+
+            <ScrollView
+                android:id="@+id/line1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:orientation="vertical"
+                    android:paddingTop="0dp">
+
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginTop="24dp"
+                        android:text="Register now"
+                        android:textColor="#7B7B7B"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/im_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="clip_horizontal"
+                        android:layout_marginBottom="50dp"
+                        android:layout_marginTop="24dp"
+                        android:text="It will take only few second to signup the first ever to fitness app in dhaka"
+                        android:textColor="#4F4F4F"
+                        android:textSize="18sp" />
+
+                    <!-- User Name Label -->
+
+
+                    <EditText
+                        android:id="@+id/input_userName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#504c4c"
+                        android:hint="User Name"
+                        android:inputType="text"
+                        android:textColor="#c1bbbb"
+                        android:textColorHint="#817e7e" />
+
+
+                    <EditText
+                        android:id="@+id/input_passport_nubmer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#504c4c"
+                        android:hint="Passport Number"
+                        android:inputType="text"
+                        android:textColor="#c1bbbb"
+                        android:textColorHint="#817e7e" />
+
+
+                    <EditText
+                        android:id="@+id/input_phone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#504c4c"
+                        android:hint="Phone"
+                        android:inputType="phone"
+                        android:textColor="#c1bbbb"
+                        android:textColorHint="#817e7e" />
+
+                    <RadioGroup
+                        android:id="@+id/radio_select"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/radio_individual_bt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="Individual"
+                            android:textColor="#817e7e"
+                            android:textColorHint="#817e7e"
+                            android:textSize="20sp" />
+
+                        <RadioButton
+                            android:id="@+id/radio_agent_bt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="0dp"
+                            android:text="Agent"
+                            android:textColor="#817e7e"
+                            android:textColorHint="#817e7e"
+                            android:textSize="20sp" />
+
+                    </RadioGroup>
+
+
+                </LinearLayout>
+
+
+            </ScrollView>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_reg1"
+                    android:layout_width="match_parent"
+                    android:clickable="true"
+                    android:layout_height="wrap_content"
+                    android:background="#000000"
+                    android:gravity="center"
+                    android:paddingRight="@dimen/_10sdp"
+                    android:text="Continue"
+                    android:textAllCaps="false"
+                    android:textColor="#938f8f"
+                    android:textSize="22sp" />
+
+            </RelativeLayout>
+
+
+
+        </RelativeLayout>
+    </FrameLayout>
+
+</RelativeLayout>

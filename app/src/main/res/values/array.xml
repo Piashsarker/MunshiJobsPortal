@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="option" >
+        <item >BDNews24</item>
+        <item >Banglamail</item>
+        <item >eprothom-alo</item>
+        <item >Somoyer konthoshor </item>
+        <item >Daily Naya Digonta</item>
+        <item >Jugantor</item>
+
+    </string-array>
+</resources>

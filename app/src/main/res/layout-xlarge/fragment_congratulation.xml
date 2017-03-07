@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#333333"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".activity.RegisterActivity">
+
+
+    <LinearLayout
+        android:id="@+id/line1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:orientation="vertical"
+        android:paddingTop="0dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="24dp"
+            android:text="Congratulations"
+            android:textColor="#7B7B7B"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/im_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="clip_horizontal"
+            android:layout_marginBottom="50dp"
+            android:layout_marginTop="24dp"
+            android:text="Your account has been successfully
+created.."
+            android:textColor="#4F4F4F"
+            android:textSize="18sp" />
+
+        <!-- User Name Label -->
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/line1"
+        android:weightSum="2"
+        android:gravity="bottom">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btn_profile"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="#000"
+            android:gravity="clip_horizontal"
+            android:paddingLeft="24dp"
+            android:paddingTop="12dp"
+            android:text="Update Profile"
+            android:textAlignment="inherit"
+            android:textAllCaps="false"
+            android:textColor="#938f8f"
+            android:textSize="@dimen/_18sdp" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btn_finish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#000000"
+            android:gravity="clip_horizontal"
+            android:paddingLeft="24dp"
+            android:paddingTop="12dp"
+            android:text="Finish"
+            android:textAlignment="inherit"
+            android:textAllCaps="false"
+            android:textColor="#938f8f"
+            android:textSize="@dimen/_18sdp" />
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>
