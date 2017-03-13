@@ -48,6 +48,10 @@ public class SessionManager {
         editor.putString(KEY_PASSWORD , password);
         editor.commit();
     }
+    public void setUserName(String userName){
+        editor.putString(KEY_NAME , userName);
+        editor.commit();
+    }
 
         public String getUserId(){
         return pref.getString(KEY_ID, null);
@@ -75,7 +79,7 @@ public class SessionManager {
     public HashMap<String, String> getUserDetails(){
         HashMap<String, String> user = new HashMap<String, String>();
         // user name
-        user.put(KEY_NAME, pref.getString(KEY_ID, null));
+        user.put(KEY_NAME, pref.getString(KEY_NAME, null));
         user.put(KEY_ID, pref.getString(KEY_ID, null));
         user.put(KEY_PASSPORT, pref.getString(KEY_PASSPORT, null));
         user.put(KEY_PHONE, pref.getString(KEY_PHONE, null));

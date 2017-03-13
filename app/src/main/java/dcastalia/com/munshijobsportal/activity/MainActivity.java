@@ -39,18 +39,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import dcastalia.com.munshijobsportal.Controller.AppController;
+import dcastalia.com.munshijobsportal.ErrorDialog;
 import dcastalia.com.munshijobsportal.Model.Jobs;
 import dcastalia.com.munshijobsportal.R;
+import dcastalia.com.munshijobsportal.SqliteDatabase.SQLiteHelper;
 import dcastalia.com.munshijobsportal.adapter.JobOpeningAdapter;
 import dcastalia.com.munshijobsportal.sessionmanager.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
 
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String TAG = MainActivity.class.getSimpleName();
+
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Button btn_search;
@@ -58,12 +63,14 @@ public class MainActivity extends AppCompatActivity {
     JobOpeningAdapter adapter;
     TextView txt;
     SessionManager sessionManager;
+    SQLiteHelper sqLiteHelper;
     private ProgressDialog pDialog;
+    private ErrorDialog errorDialog;
     private Context context = MainActivity.this;
     private ArrayList<Jobs> jobList;
     private static final String URL = " http://bestinbd.com/projects/web/munshi/restAPI/site/joblist";
     private static final String url = " http://bestinbd.com/projects/web/munshi/restAPI/site/availablejobs";
-
+    private dcastalia.com.munshijobsportal.ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
         sessionManager = new SessionManager(MainActivity.this);
         sessionManager.checkLogin();
         setContentView(R.layout.activity_main);
-
+        sqLiteHelper = new SQLiteHelper(MainActivity.this);
+        errorDialog = new ErrorDialog(MainActivity.this);
+        progressDialog = new dcastalia.com.munshijobsportal.ProgressDialog(MainActivity.this);
 
         getSupportActionBar().hide();
 
@@ -116,9 +125,6 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
 
                 mDrawerLayout.closeDrawers();
-                //  toolbar.setTitle("Munshi Enterprise");
-                // if (mDrawerLayout.isDrawerVisible(toolbar));
-
 
                 if (menuItem.getItemId() == R.id.nav_profile) {
 
@@ -130,15 +136,6 @@ public class MainActivity extends AppCompatActivity {
                 if (menuItem.getItemId() == R.id.nav_profile) {
                     Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                     startActivity(intent);
-                }
-
-                if (menuItem.getItemId() == R.id.nav_job_opening) {
-
-                    Intent intent = new Intent(MainActivity.this, JobOpeningActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
-
-
                 }
 
                 if (menuItem.getItemId() == R.id.nav_myjobs) {
@@ -155,11 +152,6 @@ public class MainActivity extends AppCompatActivity {
 
                 if (menuItem.getItemId() == R.id.nav_help) {
                     Intent intent = new Intent(MainActivity.this, HelpActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
-                }
-                if (menuItem.getItemId() == R.id.nav_setting) {
-                    Intent intent = new Intent(MainActivity.this, SettingActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 }
@@ -197,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
         jobList = new ArrayList<Jobs>();
         //Listview adapter----------------------
 
+        progressDialog.showProgress();
         // Creating volley request obj
         JsonArrayRequest jobReq = new JsonArrayRequest(URL,
                 new Response.Listener<JSONArray>() {
@@ -236,6 +229,9 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             loadJobList(jobList);
+                            saveIntoDatabase(jobList);
+                            progressDialog.hideProgress();
+
                         }
 
                         // notifying list adapter about data changes
@@ -252,23 +248,18 @@ public class MainActivity extends AppCompatActivity {
                 volleyError.printStackTrace();
 
                 if (volleyError instanceof NetworkError) {
-                    Toast.makeText(getApplicationContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
+                    errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
                 } else if (volleyError instanceof ServerError) {
-                    Toast.makeText(getApplicationContext(), "The server could not be found. Please try again after some time!!", Toast.LENGTH_SHORT).show();
-
+                    errorDialog.showDialog("Server Error!","Server Not Found. Try Again Later");
                 } else if (volleyError instanceof AuthFailureError) {
-                    Toast.makeText(getApplicationContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
-
+                    errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
 
                 } else if (volleyError instanceof ParseError) {
-                    Toast.makeText(getApplicationContext(), "Parsing error! Please try again after some time!!", Toast.LENGTH_SHORT).show();
-
+                    errorDialog.showDialog("Parsing Error!","Please Try Again Some Time");
                 } else if (volleyError instanceof NoConnectionError) {
-                    Toast.makeText(getApplicationContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
-
+                    errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
                 } else if (volleyError instanceof TimeoutError) {
-                    Toast.makeText(getApplicationContext(), "Connection TimeOut! Please check your internet connection", Toast.LENGTH_SHORT).show();
-
+                    errorDialog.showDialog("Timeout Error","Connection Timeout Check Internet Connection");
                 }
 
             }
@@ -278,8 +269,27 @@ public class MainActivity extends AppCompatActivity {
         AppController.getInstance().addToRequestQueue(jobReq);
     }
 
+    private void saveIntoDatabase(ArrayList<Jobs> jobList) {
+
+      for(int i =0 ;i<jobList.size() ; i++){
+          boolean found = sqLiteHelper.jobExists(jobList.get(i).getJobId());
+          String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
+          if(found){
+              sqLiteHelper.updateJob(jobList.get(i).getJobId(),new Jobs(jobList.get(i).getCompany(),jobList.get(i).getVacancy(),jobList.get(i).getAvailable_job(),jobList.get(i).getJob_title(),jobList.get(i).getJob_position(),jobList.get(i).getCountry(),jobList.get(i).getDate(),
+                      jobList.get(i).getSalary(),jobList.get(i).getExperince(),jobList.get(i).getAge(),jobList.get(i).getJobNature(),
+                      jobList.get(i).getGender(),jobList.get(i).getJobDescription(),jobList.get(i).getJobRequirement()));
+          }
+          else{
+              sqLiteHelper.insertJobIndividual(new Jobs(jobList.get(i).getJobId(), jobList.get(i).getCompany(),jobList.get(i).getVacancy(),jobList.get(i).getAvailable_job(),jobList.get(i).getJob_title(),jobList.get(i).getJob_position(),jobList.get(i).getCountry(),jobList.get(i).getDate(),
+                      jobList.get(i).getSalary(),jobList.get(i).getExperince(),jobList.get(i).getAge(),jobList.get(i).getJobNature(),
+                      jobList.get(i).getGender(),jobList.get(i).getJobDescription(),jobList.get(i).getJobRequirement(),currentDateTimeString,Jobs.FLAT_FOR_EMPTY));
+          }
+      }
+    }
+
     private void loadJobList(ArrayList<Jobs> jobList) {
-        adapter = new JobOpeningAdapter(context, jobList);
+        adapter = new JobOpeningAdapter(context, jobList,TAG);
         recyclerView = (RecyclerView) findViewById(R.id.list_job_open);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());

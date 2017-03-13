@@ -26,12 +26,11 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/relative1"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:background="#4D4D4D"
-
                 android:orientation="horizontal">
 
                 <EditText
@@ -39,8 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_weight="2"
                     android:background="#00000000"
                     android:ellipsize="middle"
                     android:gravity="fill_vertical"
@@ -57,9 +55,10 @@
                     android:layout_alignParentRight="true"
                     android:layout_gravity="right"
                     android:background="@drawable/search"
+
                     />
 
-            </RelativeLayout>
+            </LinearLayout>
 
 
             <LinearLayout

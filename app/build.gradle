@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "dcastalia.com.munshijobsportal"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -32,4 +32,7 @@ dependencies {
     compile 'it.sephiroth.android.library.targettooltip:target-tooltip-library:+'
     compile 'com.android.support:recyclerview-v7:25.1.1'
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support:cardview-v7:25.1.0'
+    compile 'com.github.bumptech.glide:glide:3.6.0'
+    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
 }

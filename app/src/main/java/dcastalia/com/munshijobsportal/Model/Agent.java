@@ -5,7 +5,27 @@ package dcastalia.com.munshijobsportal.Model;
  */
 public class Agent {
 
-    public Agent(int id,String name){
+
+    String id;
+    String name;
+
+    public Agent(String id, String name, String code) {
+        this.id = id;
+        this.name = name;
+        this.code = code;
+    }
+
+    String code;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public Agent(String id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -14,11 +34,11 @@ public class Agent {
 
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -29,7 +49,4 @@ public class Agent {
     public void setName(String name) {
         this.name = name;
     }
-
-    int id;
-    String name;
 }

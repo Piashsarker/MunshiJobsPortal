@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 import dcastalia.com.munshijobsportal.Controller.AppController;
+import dcastalia.com.munshijobsportal.ErrorDialog;
 import dcastalia.com.munshijobsportal.R;
 import dcastalia.com.munshijobsportal.Util.VolleyCustomRequest;
 
@@ -37,7 +38,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
     Button btn_resend_reset_code;
     Button btn_change_pass_confirm;
-
+    ErrorDialog errorDialog ;
     EditText input_reset_code;
     EditText input_new_password;
     EditText input_confirm_password;
@@ -46,6 +47,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
+
+        errorDialog = new ErrorDialog(ResetPasswordActivity.this);
+
         input_reset_code = (EditText) findViewById(R.id.input_reset_code);
         input_new_password = (EditText)findViewById(R.id.input_new_password);
         input_confirm_password = (EditText)findViewById(R.id.input_confirm_password);
@@ -122,24 +126,20 @@ public class ResetPasswordActivity extends AppCompatActivity {
                         d(TAG, "Error: " + volleyError.getMessage());
 
                         if (volleyError instanceof NetworkError) {
-                            Toast.makeText(getApplicationContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
+                            errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
                         } else if (volleyError instanceof ServerError) {
-                            Toast.makeText(getApplicationContext(), "The server could not be found. Please try again after some time!!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("Server Error!","Server Not Found. Try Again Later");
                         } else if (volleyError instanceof AuthFailureError) {
-                            Toast.makeText(getApplicationContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
 
                         } else if (volleyError instanceof ParseError) {
-                            Toast.makeText(getApplicationContext(), "Parsing error! Please try again after some time!!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("Parsing Error!","Please Try Again Some Time");
                         } else if (volleyError instanceof NoConnectionError) {
-                            Toast.makeText(getApplicationContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
                         } else if (volleyError instanceof TimeoutError) {
-                            Toast.makeText(getApplicationContext(), "Connection TimeOut! Please check your internet connection", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("Timeout Error","Connection Timeout Check Internet Connection");
                         }
+
 
 
                     }

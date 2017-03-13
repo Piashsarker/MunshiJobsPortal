@@ -6,10 +6,7 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/menu_01"
             android:title="My Profile" />
-        <item
-            android:id="@+id/nav_job_opening"
-            android:icon="@drawable/menu_job_opening"
-            android:title="Job Opening" />
+
         <item
             android:id="@+id/nav_myjobs"
             android:icon="@drawable/menu_myjobs"
@@ -23,10 +20,6 @@
             android:id="@+id/nav_help"
             android:icon="@drawable/menu_help"
             android:title="Help" />
-        <item
-            android:id="@+id/nav_setting"
-            android:icon="@drawable/menu_settings"
-            android:title="Settings" />
 
         <item
             android:id="@+id/nav_logOut"

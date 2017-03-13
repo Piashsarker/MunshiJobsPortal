@@ -20,7 +20,6 @@
             android:clickable="false"
             android:focusable="false"
             android:background="#333333">
-            >
             <RelativeLayout
                 android:id="@+id/relative1"
                 android:layout_width="match_parent"
@@ -39,7 +38,7 @@
                     android:layout_marginTop="0dp"
                     android:gravity="fill_vertical"
                     android:padding="5dp"
-                    android:text="Available Jobs(3)"
+                    android:text="Available Jobs(0)"
                     android:textColor="#ece8e8"
                     android:textSize="12sp"
                     android:textStyle="normal" />

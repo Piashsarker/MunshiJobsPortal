@@ -2,6 +2,7 @@ package dcastalia.com.munshijobsportal.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -26,10 +27,16 @@ import com.android.volley.VolleyError;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 import dcastalia.com.munshijobsportal.Controller.AppController;
+import dcastalia.com.munshijobsportal.ErrorDialog;
+import dcastalia.com.munshijobsportal.Model.Jobs;
+import dcastalia.com.munshijobsportal.ProgressDialog;
 import dcastalia.com.munshijobsportal.R;
+import dcastalia.com.munshijobsportal.SqliteDatabase.SQLiteHelper;
 import dcastalia.com.munshijobsportal.Util.VolleyCustomRequest;
 import dcastalia.com.munshijobsportal.sessionmanager.SessionManager;
 import it.sephiroth.android.library.tooltip.Tooltip;
@@ -38,56 +45,27 @@ public class JobDetailsActivity extends AppCompatActivity {
 
     Button btn_apply;
     Button btn_like;
+    private SQLiteHelper sqLiteHelper;
     String jobId, title , position , coutry,company ,vacancy, experince, salary , expireDate , age , gender , jobNature,jobDescription,jobRequirement ;
     TextView tvJobTitle , tvJobPosition , tvJobLocation, tvCompany , tvVacancy, tvExperince, tvSalary , tvExpireDate , tvAge , tvGender , tvJobNature, tvJobDescription,tvJobRequirement;
     private SessionManager sessionManager ;
+    private String TAG ;
+    ErrorDialog errorDialog;
+    ProgressDialog progressDialog ;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         requestFullScreenWindow();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_job_details);
         sessionManager = new SessionManager(JobDetailsActivity.this);
+        errorDialog = new ErrorDialog(JobDetailsActivity.this);
+        progressDialog = new ProgressDialog(JobDetailsActivity.this);
         sessionManager.checkLogin();
+         sqLiteHelper = new SQLiteHelper(JobDetailsActivity.this);
         btn_apply=(Button)findViewById(R.id.btn_apply);
-        tvJobTitle = (TextView) findViewById(R.id.txt_title);
-        btn_apply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                postApplyToServer();
-
-            }
-        });
-
         btn_like=(Button)findViewById(R.id.btn_like);
-
-        btn_like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Toast.makeText(getApplicationContext(),"Added to the favourite list!",Toast.LENGTH_LONG).show();
-
-            }
-        });
-
-        tvJobTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Tooltip.make(JobDetailsActivity.this, new Tooltip.Builder(101)
-                                .anchor(tvJobTitle, Tooltip.Gravity.BOTTOM)
-                                .closePolicy(new Tooltip.ClosePolicy()
-                                        .insidePolicy(true, false)
-                                        .outsidePolicy(true, false), 4000)
-                                .activateDelay(900)
-                                .showDelay(400)
-                                .text(tvJobTitle.getText().toString())
-                                .maxWidth(600)
-                                .withArrow(true)
-                                .withOverlay(true).build()
-                ).show();
-            }
-        });
+        tvJobTitle = (TextView) findViewById(R.id.txt_title);
 
 
         if (savedInstanceState == null) {
@@ -122,6 +100,7 @@ public class JobDetailsActivity extends AppCompatActivity {
                 jobNature = extras.getString("job_nature");
                 jobDescription = extras.getString("job_description");
                 jobRequirement = extras.getString("job_requirement");
+                TAG = extras.getString("TAG");
 
                 setView(company, title, position,coutry,vacancy,experince,salary,expireDate,age,gender,jobNature,jobDescription,jobRequirement);
             }
@@ -132,7 +111,117 @@ public class JobDetailsActivity extends AppCompatActivity {
 
         }
 
+        checkForFavAndDesign(jobId);
 
+
+
+        btn_apply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressDialog.showProgress();
+                String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                    if(sqLiteHelper.favJobExist(jobId)){
+                        sqLiteHelper.insertFavAndAppliedJobs(jobId,Jobs.FLAG_FOR_APPLIED_AND_UPDATE,currentDateTimeString);
+                        postApplyToServer();
+                    }
+                else{
+
+                        sqLiteHelper.insertAppliedJobs(jobId, Jobs.FLAG_FOR_APPLIED,currentDateTimeString);
+                        postApplyToServer();
+                    }
+                btn_apply.setText("Applied");
+                btn_apply.setClickable(false);
+                btn_apply.setBackgroundColor(Color.GRAY);
+
+
+            progressDialog.hideProgress();
+
+            }
+        });
+
+
+
+        btn_like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressDialog.showProgress();
+               if(!sqLiteHelper.favJobExist(jobId)){
+                   String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                   if(sqLiteHelper.appliedJob(jobId)){
+                       sqLiteHelper.insertFavAndAppliedJobs(jobId,Jobs.FLAG_FOR_APPLIED_AND_UPDATE,currentDateTimeString);
+                   }
+                   else {
+                       sqLiteHelper.insertFavouriteJobs(jobId,Jobs.FLAG_FOR_FAVOURITE,currentDateTimeString);
+                   }
+
+                   btn_like.setClickable(false);
+                   btn_like.setBackground(getResources().getDrawable(R.drawable.like_on));
+                   Toast.makeText(getApplicationContext(),"Added to the favourite list!",Toast.LENGTH_LONG).show();
+
+               }
+                else{
+                   Toast.makeText(JobDetailsActivity.this, "Already in Favourite List", Toast.LENGTH_SHORT).show();
+               }
+                progressDialog.hideProgress();
+            }
+        });
+
+        tvJobTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Tooltip.make(JobDetailsActivity.this, new Tooltip.Builder(101)
+                        .anchor(tvJobTitle, Tooltip.Gravity.BOTTOM)
+                        .closePolicy(new Tooltip.ClosePolicy()
+                                .insidePolicy(true, false)
+                                .outsidePolicy(true, false), 4000)
+                        .activateDelay(900)
+                        .showDelay(400)
+                        .text(tvJobTitle.getText().toString())
+                        .maxWidth(600)
+                        .withArrow(true)
+                        .withOverlay(true).build()
+                ).show();
+            }
+        });
+
+
+
+
+    }
+
+    private void checkForFavAndDesign(String jobId) {
+
+        if(sqLiteHelper.applyAndFavJob(jobId)){
+            btn_apply.setText("Applied");
+            btn_apply.setClickable(false);
+            btn_apply.setBackgroundColor(Color.GRAY);
+            btn_like.setClickable(false);
+            btn_like.setBackground(getResources().getDrawable(R.drawable.like_on));
+        }
+        else{
+            if(sqLiteHelper.appliedJob(jobId)){
+                btn_apply.setText("Applied");
+                btn_apply.setClickable(false);
+                btn_apply.setBackgroundColor(Color.GRAY);
+            }
+            else {
+                btn_apply.setText("Apply");
+                btn_apply.setClickable(true);
+                btn_apply.setBackgroundColor(Color.parseColor("#F97F1A"));
+            }
+
+            if(sqLiteHelper.favJobExist(jobId)){
+                btn_like.setClickable(false);
+                btn_like.setBackground(getResources().getDrawable(R.drawable.like_on));
+            }
+            else {
+                btn_like.setClickable(true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    btn_like.setBackground(getResources().getDrawable(R.drawable.like_off));
+                }
+
+            }
+        }
 
 
     }
@@ -158,9 +247,6 @@ public class JobDetailsActivity extends AppCompatActivity {
                             if (status == 1) {
 
                                 Toast.makeText(JobDetailsActivity.this, "Apply Successful", Toast.LENGTH_SHORT).show();
-                                btn_apply.setText("Applied");
-                                btn_apply.setClickable(false);
-                                btn_apply.setBackgroundColor(Color.GRAY);
 
                             }
                             if (status==0){
@@ -177,23 +263,18 @@ public class JobDetailsActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError volleyError) {
 
                         if (volleyError instanceof NetworkError) {
-                            Toast.makeText(JobDetailsActivity.this, "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
+                            errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
                         } else if (volleyError instanceof ServerError) {
-                            Toast.makeText(JobDetailsActivity.this, "The server could not be found. Please try again after some time!!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("Server Error!","Server Not Found. Try Again Later");
                         } else if (volleyError instanceof AuthFailureError) {
-                            Toast.makeText(JobDetailsActivity.this, "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
 
                         } else if (volleyError instanceof ParseError) {
-                            Toast.makeText(JobDetailsActivity.this, "Parsing error! Please try again after some time!!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("Parsing Error!","Please Try Again Some Time");
                         } else if (volleyError instanceof NoConnectionError) {
-                            Toast.makeText(JobDetailsActivity.this, "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("No Internet!","Enable WIFI or Mobile Data");
                         } else if (volleyError instanceof TimeoutError) {
-                            Toast.makeText(JobDetailsActivity.this, "Connection TimeOut! Please check your internet connection", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("Timeout Error","Connection Timeout Check Internet Connection");
                         }
 
 
@@ -254,7 +335,23 @@ public class JobDetailsActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                if(TAG.equals(FavouriteActivity.TAG_FAVOURITE)){
+                    Intent intent = new Intent(JobDetailsActivity.this,FavouriteActivity.class);
+                    startActivity(intent);
+                }
+                if(TAG.equals(MyJobActivity.TAG_MYJOBACTIVITY)){
+                    Intent intent = new Intent(JobDetailsActivity.this,MyJobActivity.class);
+                    startActivity(intent);
+                }
+                if(TAG.equals(JobSearchShowActivity.TAG_JOB_SEARCH_SHOW)){
+                    Intent intent = new Intent(JobDetailsActivity.this,JobSearchShowActivity.class);
+                    startActivity(intent);
+                }
+                if(TAG.equals(MainActivity.TAG)){
+                    Intent intent = new Intent(JobDetailsActivity.this,MainActivity.class);
+                    startActivity(intent);
+                }
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -262,16 +359,6 @@ public class JobDetailsActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        super.finish();
-        Intent intent = new Intent(JobDetailsActivity.this, JobOpeningActivity.class);
-        overridePendingTransition(R.anim.right_in, R.anim.right_out);
-        startActivity(intent);
-
-
-    }
 
 
 }

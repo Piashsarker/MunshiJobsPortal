@@ -15,22 +15,29 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import dcastalia.com.munshijobsportal.Controller.AppController;
+import dcastalia.com.munshijobsportal.ErrorDialog;
 import dcastalia.com.munshijobsportal.Model.Country;
 import dcastalia.com.munshijobsportal.Model.Jobs;
 import dcastalia.com.munshijobsportal.Model.Profession;
 import dcastalia.com.munshijobsportal.Model.Salary;
+import dcastalia.com.munshijobsportal.ProgressDialog;
 import dcastalia.com.munshijobsportal.R;
 
 public class JobSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -43,9 +50,14 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
     ArrayList<String> experinceYearList = new ArrayList<>();
     ArrayList<String> expireDateList = new ArrayList<>();
     private String jobName , countryId , professionId , experince , expireDate , salaryRange ;
-    private static final String URL = "http://bestinbd.com/projects/web/munshi/restAPI/site/search_prefil";
+    private static final String SEARCH_URL = "http://bestinbd.com/projects/web/munshi/restAPI/site/search";
+    private static final String SPINNER_URL = "http://bestinbd.com/projects/web/munshi/restAPI/site/search_prefil";
 
+    private String selectLocation, selectProfession , selectExperince, selectExpireDate , selectSalaryRange;
+    ProgressDialog progressDialog;
     Button btnSearch , btnSearchNow;
+    ErrorDialog errorDialog ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +66,12 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
         setContentView(R.layout.activity_job_search);
         toolbarSetup();
         initializeViews();
+        progressDialog = new ProgressDialog(JobSearchActivity.this);
+        errorDialog = new ErrorDialog(JobSearchActivity.this);
         loadServerData();
         setExpireSpinnerData();
         setExperinceSpinnerData();
+
 
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,26 +97,111 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
     }
 
     private void getJobSearchListFromServer() {
-        if(!etJobName.getText().toString().isEmpty() && !countryId.isEmpty() && !professionId.isEmpty() && !experince.isEmpty()&& !expireDate.isEmpty() &&!salaryRange.isEmpty()){
-            ArrayList<Jobs> searchJobList ;
-            searchJobList= sentToserverForResult();
-            if(!searchJobList.isEmpty()){
-                Intent intent = new Intent(JobSearchActivity.this,JobSearchShowActivity.class);
-                startActivity(intent);
+        progressDialog.showProgress();
+        final ArrayList<Jobs> searchJobList = new ArrayList<Jobs>() ;
+        jobName = etJobName.getText().toString();
+        jobName = jobName.trim().toLowerCase();
+        String tag_string_req = "req_login";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, SEARCH_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                if(response.length()==0){
+                    errorDialog.showDialog("Empty","No Data Found..");
+                }
+                else{
+                    Log.d("JobSearchActivity", "Search Response " + response.toString());
+                    try {
+                        JSONArray jsonArray  = new JSONArray(response);
+                        for (int i=0 ; i<jsonArray.length();i++){
+                            JSONObject obj = jsonArray.getJSONObject(i);
+                            Jobs jobs = new Jobs();
+                            jobs.setJobId(obj.getString("job_id"));
+                            jobs.setJob_title(obj.getString("title"));
+                            jobs.setJob_position(obj.getString("position_company"));
+                            jobs.setCountry(obj.getString("country"));
+                            jobs.setCompany(obj.getString("company"));
+                            jobs.setDate(obj.getString("expire_date"));
+                            jobs.setVacancy(obj.getString("no_of_vacancy"));
+                            jobs.setExperince(obj.getString("experience"));
+                            jobs.setSalary(obj.getString("salary"));
+                            //jobs.setAge(obj.getString(""));
+                            //jobs.setGender(obj.getString(""));
+                            jobs.setJobNature(obj.getString("nature"));
+                            //jobs.setJobDescription(obj.getString(""));
+                            jobs.setJobRequirement(obj.getString("requirements"));
+
+
+                            // adding jobs to Jobs array
+
+                            searchJobList.add(jobs);
+                        }
+                        goToSearchResultActivity(searchJobList);
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
             }
-            else {
-                Toast.makeText(this, "No Matching Data", Toast.LENGTH_SHORT).show();
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+            errorDialog.showDialog("Error!","Server Error!");
             }
-        }
-        else{
-            Toast.makeText(this, "Fields Are Empty", Toast.LENGTH_SHORT).show();
-        }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Map<String, String> params = new HashMap<String, String>();
+                 if(!jobName.equals("")){
+                     params.put("job_name", jobName);
+                 }
+
+                if(!countryId.equals("")){
+                    params.put("country_id",countryId);
+                }
+                if(!professionId.equals("")){
+                    params.put("trade_id",professionId);
+                }
+                if(!experince.equals("")){
+                    params.put("experience",experince);
+                }
+                if(!salaryRange.equals("")){
+                    params.put("salary_range",salaryRange);
+                }
+                if(!expireDate.equals("")){
+                    params.put("deadline",expireDate);
+                }
+
+               //
+
+
+                return params;
+            }
+        };
+
+
+        AppController.getInstance().addToRequestQueue(stringRequest,tag_string_req);
+
+        progressDialog.hideProgress();
+
+    }
+
+    private void goToSearchResultActivity(ArrayList<Jobs> searchJobList) {
+
+        Intent intent = new Intent(JobSearchActivity.this,JobSearchShowActivity.class);
+        intent.putExtra("job_list", searchJobList);
+        startActivity(intent);
 
     }
 
     private void loadServerData() {
 
-        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,URL,null,new Response.Listener<JSONObject>() {
+        progressDialog.showProgress();
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,SPINNER_URL,null,new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -171,19 +271,22 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
         });
 
         AppController.getInstance().addToRequestQueue(jsonObjectRequest);
+        progressDialog.hideProgress();
+
     }
 
     private void setExperinceSpinnerData() {
-        experinceYearList.add("1 Yrs");
-        experinceYearList.add("2 Yrs");
-        experinceYearList.add("3 Yrs");
-        experinceYearList.add("4 Yrs");
-        experinceYearList.add("5 Yrs");
-        experinceYearList.add("6 Yrs");
-        experinceYearList.add("7 Yrs");
-        experinceYearList.add("8 Yrs");
-        experinceYearList.add("9 Yrs");
-        experinceYearList.add("10 Yrs");
+        experinceYearList.add(getResources().getString(R.string.select_experience));
+        experinceYearList.add("1");
+        experinceYearList.add("2");
+        experinceYearList.add("3");
+        experinceYearList.add("4");
+        experinceYearList.add("5");
+        experinceYearList.add("6");
+        experinceYearList.add("7");
+        experinceYearList.add("8");
+        experinceYearList.add("9");
+        experinceYearList.add("10");
         ArrayAdapter<String> salaryRangeAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,experinceYearList);
         salaryRangeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         experinceSpinner.setAdapter(salaryRangeAdapter);
@@ -192,9 +295,12 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
 
     private void setProfessionSpinnerData(ArrayList<Profession> professionArrayList) {
         ArrayList<String> professionName = new ArrayList<>();
+        professionName.add(getResources().getString(R.string.select_profession));
         for(int i =0 ; i<professionArrayList.size();i++){
+
             professionName.add(professionArrayList.get(i).getProfessionName());
         }
+
         ArrayAdapter<String> professionAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,professionName);
         professionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         professionSpinner.setAdapter(professionAdapter);
@@ -204,9 +310,11 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
 
     private void setLocationSpinnerData(ArrayList<Country> countryArrayList) {
         ArrayList<String> countryName = new ArrayList<>();
+        countryName.add(getResources().getString(R.string.select_location));
         for(int i =0 ; i<countryArrayList.size();i++){
             countryName.add(countryArrayList.get(i).getCountryName());
         }
+
         ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,countryName);
         locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         locationSpinner.setAdapter(locationAdapter);
@@ -214,15 +322,17 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
     }
 
     private void setExpireSpinnerData() {
-
-        expireDateList.add("10 days");
-        expireDateList.add("20 days");
-        expireDateList.add("30 days");
-        expireDateList.add("40 days");
-        expireDateList.add("50 days");
-        expireDateList.add("60 days");
-        expireDateList.add("70 days");
-        expireDateList.add("80 days");
+        expireDateList.add(getResources().getString(R.string.select_expire_date));
+        expireDateList.add("10");
+        expireDateList.add("20");
+        expireDateList.add("30");
+        expireDateList.add("40");
+        expireDateList.add("50");
+        expireDateList.add("60");
+        expireDateList.add("70");
+        expireDateList.add("80");
+        expireDateList.add("100");
+        expireDateList.add("120");
         ArrayAdapter<String> salaryRangeAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,expireDateList);
         salaryRangeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         expireSpinner.setAdapter(salaryRangeAdapter);
@@ -230,6 +340,7 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
 
     private void setSalaryRangeSpinnerData(ArrayList<Salary> salaryList) {
         ArrayList<String> salaryRange = new ArrayList<>();
+        salaryRange.add(getResources().getString(R.string.select_salary_range));
         for(int i =0 ; i<salaryList.size();i++){
             salaryRange.add(salaryList.get(i).getSalaryRange());
         }
@@ -278,22 +389,45 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
 
         Spinner spinner = (Spinner)parent;
         if (spinner.getId()==R.id.spinner_location){
-            countryId = countryArrayList.get(position).getCountryId();
+            selectLocation = locationSpinner.getSelectedItem().toString();
+            if(selectLocation.equals(getResources().getString(R.string.select_location))){
+                countryId = "";
+            }
+            else{
+                countryId = countryArrayList.get(position-1).getCountryId();
+            }
         }
-
         if (spinner.getId()==R.id.spinner_profession){
-            professionId = professionArrayList.get(position).getProfessionId();
+            selectProfession = professionSpinner.getSelectedItem().toString();
+            if(selectProfession.equals(getResources().getString(R.string.select_profession))){
+                professionId= "";
+            }
+            else {
+                professionId = professionArrayList.get(position-1).getProfessionId();
+            }
 
         }
-
         if (spinner.getId()==R.id.spinner_experince){
             experince = experinceSpinner.getSelectedItem().toString();
+            if(experince.equals(getResources().getString(R.string.select_experience))){
+               experince = "";
+            }
         }
         if (spinner.getId()==R.id.spinner_expire_date){
             expireDate = expireSpinner.getSelectedItem().toString();
+            if(expireDate.equals(getResources().getString(R.string.select_expire_date))){
+                expireDate= "";
+            }
         }
         if (spinner.getId()==R.id.spinner_salary_range){
-            salaryRange = salaryArrayList.get(position).getSalaryRange();
+            selectSalaryRange = salaryRangeSpinner.getSelectedItem().toString();
+            if(selectSalaryRange.equals(getResources().getString(R.string.select_salary_range))){
+                salaryRange = "";
+            }
+            else{
+                salaryRange = salaryArrayList.get(position-1).getSalaryRange();
+            }
+
         }
 
 
@@ -306,10 +440,10 @@ public class JobSearchActivity extends AppCompatActivity implements AdapterView.
 
     }
 
-
-
-
-    private ArrayList<Jobs> sentToserverForResult() {
-        return null;
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(JobSearchActivity.this,MainActivity.class);
+        startActivity(intent);
     }
 }

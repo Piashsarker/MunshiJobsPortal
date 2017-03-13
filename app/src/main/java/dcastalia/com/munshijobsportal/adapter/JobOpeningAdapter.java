@@ -11,9 +11,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import dcastalia.com.munshijobsportal.activity.JobDetailsActivity;
 import dcastalia.com.munshijobsportal.Model.Jobs;
 import dcastalia.com.munshijobsportal.R;
+import dcastalia.com.munshijobsportal.activity.JobDetailsActivity;
 
 /**
  * Created by PT on 3/1/2017.
@@ -23,9 +23,11 @@ public class JobOpeningAdapter extends RecyclerView.Adapter<JobOpeningAdapter.Vi
 
     private Context context ;
     private ArrayList<Jobs> jobsArrayList;
-    public JobOpeningAdapter(Context context , ArrayList<Jobs> jobsArrayList){
+    private String tag ;
+    public JobOpeningAdapter(Context context , ArrayList<Jobs> jobsArrayList,String tag){
         this.jobsArrayList = jobsArrayList ;
         this.context = context;
+        this.tag = tag;
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -58,6 +60,7 @@ public class JobOpeningAdapter extends RecyclerView.Adapter<JobOpeningAdapter.Vi
                     intent.putExtra("job_nature",jobsArrayList.get(position).getJobNature());
                     intent.putExtra("job_description","Here Goes A Job Description");
                     intent.putExtra("job_requirement",jobsArrayList.get(position).getJobRequirement());
+                    intent.putExtra("TAG",tag);
                     context.startActivity(intent);
                 }
             });

@@ -14,12 +14,14 @@ public class User {
     private String phone;
     private String address;
     private String gender;
+    private String picturePath;
+
 
     public User() {
 
     }
 
-    public User(String name, String dateOfBirth, String profession, String passportNo, String nationalId, String email, String phone, String address, String gender) {
+    public User(String name, String dateOfBirth, String profession, String passportNo, String nationalId, String email, String phone, String address, String gender, String picturePath) {
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.profession = profession;
@@ -29,6 +31,7 @@ public class User {
         this.phone = phone;
         this.address = address;
         this.gender = gender;
+        this.picturePath = picturePath;
     }
 
     public String getName() {
@@ -101,5 +104,13 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public String getPicturePath() {
+        return picturePath;
+    }
+
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
     }
 }

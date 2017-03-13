@@ -19,7 +19,7 @@
             android:textColor="#fff"
             android:textSize="40dp"
             android:textAlignment="center"
-            android:text="Help Activity" />
+            android:text="Setting Activity" />
 
     </RelativeLayout>
 

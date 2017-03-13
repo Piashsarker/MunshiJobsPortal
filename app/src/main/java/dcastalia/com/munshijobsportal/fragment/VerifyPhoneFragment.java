@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 import dcastalia.com.munshijobsportal.Controller.AppController;
+import dcastalia.com.munshijobsportal.ErrorDialog;
 import dcastalia.com.munshijobsportal.R;
 import dcastalia.com.munshijobsportal.Util.VolleyCustomRequest;
 import dcastalia.com.munshijobsportal.sessionmanager.SessionManager;
@@ -45,6 +46,7 @@ public class VerifyPhoneFragment extends Fragment {
     Button btn_phone_varify;
     EditText input_varify_code;
     String varify_code;
+    ErrorDialog errorDialog ;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +61,7 @@ public class VerifyPhoneFragment extends Fragment {
 
         input_varify_code = (EditText) view.findViewById(R.id.input_varify_code);
         input_varify_code.setText(sessionManager.getUserDetails().get(sessionManager.KEY_VERIFICATION_CODE));
-
+        errorDialog = new ErrorDialog(getContext());
 
 
         btn_phone_varify.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +116,7 @@ public class VerifyPhoneFragment extends Fragment {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            errorDialog.showDialog("Error!","Try Again Later!");
                         }
                     }
                 },
@@ -122,23 +125,22 @@ public class VerifyPhoneFragment extends Fragment {
                     public void onErrorResponse(VolleyError volleyError) {
                         d(TAG, "Error: " + volleyError.getMessage());
 
+
                         if (volleyError instanceof NetworkError) {
-                            Toast.makeText(getContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
+                            errorDialog.showDialog("No Internet!","Enable Moblie Data or WIFI");
                         } else if (volleyError instanceof ServerError) {
-                            Toast.makeText(getContext(), "The server could not be found. Please try again after some time!!", Toast.LENGTH_SHORT).show();
+                            errorDialog.showDialog("Server Error!","Server Not Found,Try Again Later!");
 
                         } else if (volleyError instanceof AuthFailureError) {
-                            Toast.makeText(getContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
+                            errorDialog.showDialog("No Internet!","Enable Moblie Data or WIFI");
 
                         } else if (volleyError instanceof ParseError) {
-                            Toast.makeText(getContext(), "Parsing error! Please try again after some time!!", Toast.LENGTH_SHORT).show();
 
+                            errorDialog.showDialog("Parsing Error!","Parsing Error, Try Again Later.");
                         } else if (volleyError instanceof NoConnectionError) {
-                            Toast.makeText(getContext(), "Cannot connect to Internet...Please check your connection!", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("No Internet!","Enable Moblie Data or WIFI");
                         } else if (volleyError instanceof TimeoutError) {
-                            Toast.makeText(getContext(), "Connection TimeOut! Please check your internet connection", Toast.LENGTH_SHORT).show();
-
+                            errorDialog.showDialog("Request Timeout!","Please Check Your Internet Connection");
                         }
 
 

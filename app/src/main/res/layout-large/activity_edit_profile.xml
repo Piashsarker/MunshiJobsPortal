@@ -51,35 +51,18 @@
             android:orientation="vertical">
 
 
-            <TextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Shah Md. Imtiyaj"
+                android:id="@+id/et_profile_name"
+                android:hint="Name"
                 android:layout_marginLeft="24dp"
                 android:textColor="#F97F1A"
                 android:textSize="25sp" />
-
-            <TextView
-                android:id="@+id/im_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp"
-                android:layout_marginTop="50dp"
-                android:text="Dhaka,Bangladesh"
-                android:textColor="#c1bbbb"
-                android:textSize="20sp" />
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btn_edit"
-                android:layout_width="50dp"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/edit"
-                android:layout_height="50dp"
-
-                />
+            <requestFocus />
 
 
-            />
+
 
         </RelativeLayout>
 
@@ -117,26 +100,40 @@
 
             </EditText>
 
-            <requestFocus />
+
 
 
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:layout_height="match_parent">
-
 
                 <EditText
                     android:id="@+id/birth_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="0dp"
+                    android:hint="Birth Date"
+                    android:layout_weight="1"
                     android:textColor="#c1bbbb"
                     android:textColorHint="#817e7e"
-                    android:hint="Date of birth"
-                    android:inputType="date"
+                    android:inputType="none"
+                    android:editable="false"
+                    android:padding="10dp">
+
+                </EditText>
+                <Button
+                    android:id="@+id/btn_date_picker"
+                    android:layout_width="150dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/calender"
+                    android:layout_weight="2"
+                    android:textSize="18dp"
+                    android:layout_marginBottom="10dp"
+                    android:textAlignment="viewStart"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="0dp"
+                    android:textColor="#c1bbbb"
                     android:padding="10dp"
                     />
 
@@ -220,6 +217,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#817e7e"
+                    android:checked="true"
                     android:textColorHint="#817e7e"
                     android:text="Male"
                     android:textSize="20sp" />
