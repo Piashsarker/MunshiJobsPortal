@@ -62,7 +62,7 @@ public class JobDetailsActivity extends AppCompatActivity {
         errorDialog = new ErrorDialog(JobDetailsActivity.this);
         progressDialog = new ProgressDialog(JobDetailsActivity.this);
         sessionManager.checkLogin();
-         sqLiteHelper = new SQLiteHelper(JobDetailsActivity.this);
+        sqLiteHelper = new SQLiteHelper(JobDetailsActivity.this);
         btn_apply=(Button)findViewById(R.id.btn_apply);
         btn_like=(Button)findViewById(R.id.btn_like);
         tvJobTitle = (TextView) findViewById(R.id.txt_title);
@@ -118,23 +118,26 @@ public class JobDetailsActivity extends AppCompatActivity {
         btn_apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressDialog.showProgress();
-                String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                if(!sqLiteHelper.appliedJob(jobId)){
+                    String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                     if(sqLiteHelper.favJobExist(jobId)){
                         sqLiteHelper.insertFavAndAppliedJobs(jobId,Jobs.FLAG_FOR_APPLIED_AND_UPDATE,currentDateTimeString);
-                        postApplyToServer();
                     }
-                else{
-
+                    else{
                         sqLiteHelper.insertAppliedJobs(jobId, Jobs.FLAG_FOR_APPLIED,currentDateTimeString);
-                        postApplyToServer();
                     }
-                btn_apply.setText("Applied");
-                btn_apply.setClickable(false);
-                btn_apply.setBackgroundColor(Color.GRAY);
+                    postApplyToServer();
+
+                    btn_apply.setText("Applied");
+                    btn_apply.setClickable(false);
+                    btn_apply.setBackgroundColor(Color.GRAY);
+                }
+                else{
+                    Toast.makeText(JobDetailsActivity.this, "Already Applied", Toast.LENGTH_SHORT).show();
+                }
 
 
-            progressDialog.hideProgress();
+
 
             }
         });

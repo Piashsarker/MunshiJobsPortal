@@ -34,7 +34,7 @@ public class SessionManager {
 
     public void createLoginSession(String  id , String name ,  String phone, String passport ,String verificationCode){
         // Storing login value as TRUE
-        editor.putBoolean(IS_LOGIN, true);
+
         editor.putString(KEY_NAME,name);
         // Storing name in pref
         editor.putString(KEY_PHONE, phone);
@@ -44,12 +44,21 @@ public class SessionManager {
         // commit changes
         editor.commit();
     }
+    public void setLoginSession(boolean isLoggedIn){
+        editor.putBoolean(IS_LOGIN, isLoggedIn);
+        editor.commit();
+    }
+
     public void setPassword(String password){
         editor.putString(KEY_PASSWORD , password);
         editor.commit();
     }
     public void setUserName(String userName){
         editor.putString(KEY_NAME , userName);
+        editor.commit();
+    }
+    public void setPhone(String phone){
+        editor.putString(KEY_PHONE , phone);
         editor.commit();
     }
 

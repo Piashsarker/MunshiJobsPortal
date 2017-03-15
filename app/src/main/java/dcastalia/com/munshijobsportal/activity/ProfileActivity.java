@@ -48,13 +48,13 @@ public class ProfileActivity extends AppCompatActivity {
         initializeView();
 
 
-        profileName = sessionManager.getUserDetails().get(sessionManager.KEY_NAME);
-        phone = sessionManager.getUserDetails().get(sessionManager.KEY_PASSPORT);
-        passport = sessionManager.getUserDetails().get(sessionManager.KEY_PHONE);
+        profileName = sessionManager.getUserDetails().get(SessionManager.KEY_NAME);
+        phone = sessionManager.getUserDetails().get(SessionManager.KEY_PHONE);
+        passport = sessionManager.getUserDetails().get(SessionManager.KEY_PASSPORT);
         if(profileName!= null && phone != null&& passport != null){
             txtProfileName.setText(profileName);
-            inputPassport_Number.setText(phone);
-            inputPhone_Number.setText(passport);
+            inputPassport_Number.setText(passport);
+            inputPhone_Number.setText(phone);
         }
         setdata();
         initializeToolbar();
@@ -70,10 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void goToEditProfileActivity() {
-        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-        intent.putExtra("name",profileName);
-        intent.putExtra("phone",phone);
-        intent.putExtra("passport",passport);
+
         profession = inputProfession.getText().toString();
         email =inputEmail.getText().toString();
         nationalId = inputNID_Number.getText().toString();
@@ -82,16 +79,18 @@ public class ProfileActivity extends AppCompatActivity {
         address = inputAddress.getText().toString();
         gender = etGender.getText().toString();
 
-        if(!profession.isEmpty()&&!email.isEmpty() && nationalId.isEmpty() && !passport.isEmpty()
-                &&!dateOfBirth.isEmpty() &&!address.isEmpty() && !gender.isEmpty()){
-            intent.putExtra("profession",profession);
-            intent.putExtra("email",email);
+
+          Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+               intent.putExtra("name",profileName);
+                intent.putExtra("phone",phone);
+                intent.putExtra("passport",passport);
+                intent.putExtra("profession",profession);
+              intent.putExtra("email",email);
             intent.putExtra("national_id",nationalId);
-            intent.putExtra("passport",passport);
             intent.putExtra("date_of_birth",dateOfBirth);
             intent.putExtra("address",address);
             intent.putExtra("gender",gender);
-        }
+
         startActivity(intent);
     }
 
@@ -156,7 +155,7 @@ public class ProfileActivity extends AppCompatActivity {
         inputProfession = (TextView) findViewById(R.id.profession);
         inputPassport_Number = (TextView) findViewById(R.id.passport_no);
         inputNID_Number = (TextView) findViewById(R.id.nid_no);
-        inputEmail = (TextView) findViewById(R.id.input_email);
+        inputEmail = (TextView) findViewById(R.id.email);
         inputPhone_Number = (TextView) findViewById(R.id.phone_no);
         inputAddress = (TextView) findViewById(R.id.input_address);
         imageView = (ImageView) findViewById(R.id.profile_pic_id);

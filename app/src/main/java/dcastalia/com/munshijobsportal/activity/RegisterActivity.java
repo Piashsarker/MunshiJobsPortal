@@ -4,12 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -69,6 +73,7 @@ public class RegisterActivity extends AppCompatActivity  implements AdapterView.
     RadioGroup radioGroup;
     ErrorDialog errorDialog ;
     ProgressDialog progressDialog ;
+    TextInputLayout inputLayoutUserName , inputLayoutPassportNo , inputLayoutPhone;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -79,6 +84,9 @@ public class RegisterActivity extends AppCompatActivity  implements AdapterView.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        initializeView();
+
         sessionManager = new SessionManager(this);
         progressDialog = new ProgressDialog(this);
         if(sessionManager.isLoggedIn()){
@@ -95,60 +103,17 @@ public class RegisterActivity extends AppCompatActivity  implements AdapterView.
 
 
 
-        input_userName = (EditText) findViewById(R.id.input_userName);
-        input_passport_nubmer = (EditText) findViewById(R.id.input_passport_nubmer);
-        input_phone = (EditText) findViewById(R.id.input_phone);
-        radioGroup = (RadioGroup) findViewById(R.id.radio_select);
+
 
 
         btn_reg1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                name = input_userName.getText().toString();
-                passport = input_passport_nubmer.getText().toString();
-                phone = input_phone.getText().toString();
-                radioSelectedId = radioGroup.getCheckedRadioButtonId();
-                radioButton = (RadioButton) findViewById(radioSelectedId);
-                category = radioButton.getText().toString();
-
-                if (input_userName.getText().toString().length() == 0) {
-                    input_userName.setError("Please enter your name");
-                    input_userName.requestFocus();
-                } else if (input_passport_nubmer.getText().toString().length() == 0) {
-                    input_passport_nubmer.setError("Please enter your passport number");
-                    input_passport_nubmer.requestFocus();
-                } else if (input_passport_nubmer.length()!= 9) {
-                    Toast.makeText(context, "Passport Required 9 Digit", Toast.LENGTH_SHORT).show();
-
-                } else if (input_phone.getText().toString().length() != 11) {
-                    input_phone.setError("Please enter your phone number");
-                    input_phone.requestFocus();
-                } else if (!isValidPhone(phone)) {
-                    Toast.makeText(context, "Phone number not valid!", Toast.LENGTH_LONG).show();
-
-                } else if (category == null) {
-                    Toast.makeText(context, "Select Catagory!", Toast.LENGTH_LONG).show();
-
-                }
+                submitRegistration();
 
 
-                if (name != null && passport != null && category != null) {
-                    if (category.equals("Individual")) {
-                       progressDialog.showProgress();
-                        dataSendToServer(name, passport, phone, category);
-                        fragmentTransaction();
-                        progressDialog.hideProgress();
-                    }
-                    if (category.equals("Agent")) {
-                        progressDialog.showProgress();
-                        dataSendToServer(name, passport, phone, category);
-                        fragmentTransactionAgent();
-                        progressDialog.hideProgress();
-                    }
 
-
-                }
 
 
 
@@ -159,6 +124,124 @@ public class RegisterActivity extends AppCompatActivity  implements AdapterView.
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    private void initializeView() {
+        input_userName = (EditText) findViewById(R.id.input_userName);
+        input_passport_nubmer = (EditText) findViewById(R.id.input_passport_nubmer);
+        input_phone = (EditText) findViewById(R.id.input_phone);
+        radioGroup = (RadioGroup) findViewById(R.id.radio_select);
+        inputLayoutUserName = (TextInputLayout) findViewById(R.id.input_layout_user_name);
+        inputLayoutPassportNo = (TextInputLayout) findViewById(R.id.input_layout_passport);
+        inputLayoutPhone = (TextInputLayout) findViewById(R.id.input_layout_phone);
+        input_userName.addTextChangedListener(new MyTextWatcher(input_userName));
+        input_passport_nubmer.addTextChangedListener(new MyTextWatcher(input_passport_nubmer));
+        input_phone.addTextChangedListener(new MyTextWatcher(input_phone));
+
+
+    }
+
+    private void submitRegistration() {
+        if (!validateName()) {
+            return;
+        }
+
+        if (!validatePassport()) {
+            return;
+        }
+
+        if (!validatePhone()) {
+            return;
+        }
+
+        sentRegistrationInformation();
+
+    }
+
+    private void sentRegistrationInformation() {
+
+        name = input_userName.getText().toString();
+        passport = input_passport_nubmer.getText().toString();
+        phone = input_phone.getText().toString();
+        radioSelectedId = radioGroup.getCheckedRadioButtonId();
+        radioButton = (RadioButton) findViewById(radioSelectedId);
+        category = radioButton.getText().toString();
+        dataSendToServer(name, passport, phone, category);
+
+
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private View view;
+
+        private MyTextWatcher(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void afterTextChanged(Editable editable) {
+            switch (view.getId()) {
+                case R.id.input_userName:
+                    validateName();
+                    break;
+                case R.id.input_passport_nubmer:
+                    validatePassport();
+                    break;
+                case R.id.input_phone:
+                    validatePhone();
+                    break;
+            }
+        }
+    }
+
+    private void requestFocus(View view) {
+        if (view.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+    }
+
+    private boolean validatePhone() {
+        if (input_phone.getText().toString().trim().isEmpty() || input_phone.getText().length()!=11) {
+            inputLayoutPhone.setError(getString(R.string.err_msg_phone));
+            requestFocus(input_phone);
+            return false;
+        } else {
+            inputLayoutPhone.setErrorEnabled(false);
+        }
+
+        return true;
+
+    }
+
+    private boolean validatePassport() {
+        if (input_passport_nubmer.getText().toString().trim().isEmpty() || input_passport_nubmer.getText().length()!=9) {
+            input_passport_nubmer.setError(getString(R.string.err_msg_passport));
+            requestFocus(input_passport_nubmer);
+            return false;
+        } else {
+            inputLayoutPassportNo.setErrorEnabled(false);
+        }
+
+        return true;
+
+    }
+
+    private boolean validateName() {
+        if (input_userName.getText().toString().trim().isEmpty()) {
+            input_userName.setError(getString(R.string.err_msg_name));
+            requestFocus(input_userName);
+            return false;
+        } else {
+            inputLayoutUserName.setErrorEnabled(false);
+        }
+
+        return true;
     }
 
     private void fragmentTransactionAgent() {
@@ -193,8 +276,8 @@ public class RegisterActivity extends AppCompatActivity  implements AdapterView.
 
     public void dataSendToServer(final String name, final String passport, final String phone, String catagory) {
 
+        progressDialog.showProgress();
         String hitURL = "http://bestinbd.com/projects/web/munshi/restAPI/site/register";
-
         HashMap<String, String> params = new HashMap<>();
         params.put("name", name); //Items - Item 1 - name
         params.put("passport", passport); //Items - passport
@@ -219,7 +302,19 @@ public class RegisterActivity extends AppCompatActivity  implements AdapterView.
                                         response.getString("message"), Toast.LENGTH_SHORT).show();
                                 Toast.makeText(context, response.getString("verification_code").toString(), Toast.LENGTH_LONG).show();
 
+                                if(category.equals("Individual")){
+                                    progressDialog.hideProgress();
+                                    fragmentTransaction();
+                                }
+                                else{
+                                    progressDialog.hideProgress();
+                                    fragmentTransactionAgent();
+                                }
 
+                            }
+                            else{
+                                progressDialog.hideProgress();
+                               errorDialog.showDialog("Sorry!","Phone Number Not Unique");
                             }
 
                         } catch (JSONException e) {

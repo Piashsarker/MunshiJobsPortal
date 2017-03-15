@@ -60,7 +60,7 @@ public class VerifyPhoneFragment extends Fragment {
         btn_phone_varify = (Button) view.findViewById(R.id.btn_phone_varify);
 
         input_varify_code = (EditText) view.findViewById(R.id.input_varify_code);
-        input_varify_code.setText(sessionManager.getUserDetails().get(sessionManager.KEY_VERIFICATION_CODE));
+        input_varify_code.setText(sessionManager.getUserDetails().get(SessionManager.KEY_VERIFICATION_CODE));
         errorDialog = new ErrorDialog(getContext());
 
 

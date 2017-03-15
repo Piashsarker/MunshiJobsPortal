@@ -44,7 +44,7 @@
                     android:ellipsize="middle"
                     android:gravity="fill_vertical"
                     android:hint="Search By"
-                    android:textColor="#f9f5f5"
+                    android:textColor="#c1bbbb"
                     android:textColorHint="#817e7e"
                     android:textSize="12sp"
                     android:textStyle="normal" />
@@ -94,6 +94,7 @@
                 <Spinner
                     android:layout_width="fill_parent"
                     android:layout_height="50dp"
+                    android:textColor="#c1bbbb"
                     android:id="@+id/spinner_location"
                     />
 
@@ -132,6 +133,7 @@
                 <Spinner
                     android:layout_width="fill_parent"
                     android:layout_height="50dp"
+                    android:textColor="#c1bbbb"
                     android:id="@+id/spinner_profession"
                     />
 
@@ -177,6 +179,7 @@
                     <Spinner
                         android:layout_width="fill_parent"
                         android:layout_height="50dp"
+                        android:textColor="#c1bbbb"
                         android:layout_marginRight="@dimen/_5sdp"
                         android:id="@+id/spinner_experince" />
 
@@ -190,6 +193,7 @@
                     <Spinner
                         android:layout_width="fill_parent"
                         android:layout_height="50dp"
+                        android:textColor="#c1bbbb"
                         android:layout_marginRight="@dimen/_5sdp"
                         android:id="@+id/spinner_expire_date" />
 
@@ -229,6 +233,7 @@
                 <Spinner
                     android:layout_width="fill_parent"
                     android:layout_height="50dp"
+                    android:textColor="#c1bbbb"
                     android:id="@+id/spinner_salary_range"/>
 
 

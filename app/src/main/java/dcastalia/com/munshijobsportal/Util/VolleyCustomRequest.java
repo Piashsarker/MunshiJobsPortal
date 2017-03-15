@@ -37,6 +37,8 @@ public class VolleyCustomRequest extends Request<JSONObject> {
         return params;
     }
 
+
+
     @Override
     protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
         try {
@@ -50,6 +52,7 @@ public class VolleyCustomRequest extends Request<JSONObject> {
             return Response.error(new ParseError(je));
         }
     }
+
 
     @Override
     protected void deliverResponse(JSONObject response) {

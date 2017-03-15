@@ -69,12 +69,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        if(!cursor.moveToFirst() || cursor.getCount()==0){
-            found = false ;
-        }
-        else{
-            found = true;
-        }
+        found = !(!cursor.moveToFirst() || cursor.getCount() == 0);
 
         return found;
 
@@ -84,12 +79,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM "+TABLE_JOBS+" WHERE job_id="+jobId +" and (flag="+Jobs.FLAG_FOR_FAVOURITE+" or flag="+Jobs.FLAG_FOR_APPLIED_AND_UPDATE+")" ;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if(!cursor.moveToFirst() || cursor.getCount()==0){
-            found = false ;
-        }
-        else{
-            found = true;
-        }
+        found = !(!cursor.moveToFirst() || cursor.getCount() == 0);
 
         return found;
     }
@@ -99,12 +89,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        if(!cursor.moveToFirst() || cursor.getCount()==0){
-            found = false ;
-        }
-        else{
-            found = true;
-        }
+        found = !(!cursor.moveToFirst() || cursor.getCount() == 0);
 
         return found;
     }
@@ -115,12 +100,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        if(!cursor.moveToFirst() || cursor.getCount()==0){
-            found = false ;
-        }
-        else{
-            found = true;
-        }
+        found = !(!cursor.moveToFirst() || cursor.getCount() == 0);
 
         return found;
     }
@@ -136,7 +116,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 values.put("date_of_birth", user.getDateOfBirth());
                 values.put("passport_no", user.getPassportNo());
                 values.put("national_id", user.getNationalId());
-                values.put("email", user.getNationalId());
+                values.put("email", user.getEmail());
                 values.put("phone", user.getPhone());
                 values.put("address", user.getAddress());
                 values.put("gender", user.getGender());

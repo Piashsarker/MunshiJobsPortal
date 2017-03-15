@@ -29,6 +29,8 @@ import java.util.HashMap;
 
 import dcastalia.com.munshijobsportal.Controller.AppController;
 import dcastalia.com.munshijobsportal.ErrorDialog;
+import dcastalia.com.munshijobsportal.PasswordValidator;
+import dcastalia.com.munshijobsportal.ProgressDialog;
 import dcastalia.com.munshijobsportal.R;
 import dcastalia.com.munshijobsportal.Util.VolleyCustomRequest;
 import dcastalia.com.munshijobsportal.sessionmanager.SessionManager;
@@ -46,6 +48,8 @@ public class SetPasswordFragmentUser extends Fragment {
     EditText input_confirm_password;
     SessionManager sessionManager ;
     ErrorDialog errorDialog ;
+    PasswordValidator passwordValidator ;
+    ProgressDialog progressDialog ;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,6 +58,8 @@ public class SetPasswordFragmentUser extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_set_password_user, container, false);
 
+        progressDialog = new ProgressDialog(getContext());
+        passwordValidator = new PasswordValidator();
         errorDialog = new ErrorDialog(getContext());
         sessionManager = new SessionManager(getContext());
         input_password = (EditText) view.findViewById(R.id.input_password);
@@ -70,11 +76,11 @@ public class SetPasswordFragmentUser extends Fragment {
                 String repassword = input_confirm_password.getText().toString();
 
 
-                if (input_password.getText().toString().length() == 0) {
-                    input_password.setError("Please enter password");
+                if (!passwordValidator.validate(password)) {
+                    input_password.setError("6 Character & One Uppercase Letter Required");
                     input_password.requestFocus();
-                } else if (input_confirm_password.getText().toString().length() == 0) {
-                    input_confirm_password.setError("Please confirm your password");
+                } else if (!passwordValidator.validate(repassword)) {
+                    input_password.setError("6 Character & One Uppercase Letter Required");
                     input_confirm_password.requestFocus();
                 } else if (!checkPassWordAndConfirmPassword(password, repassword)) {
 
@@ -82,14 +88,7 @@ public class SetPasswordFragmentUser extends Fragment {
                 } else {
 
                     dataSendToServer(sessionManager.getUserId(), password);
-                    sessionManager.setPassword(password);
-                    Fragment fragment = new VerifyPhoneFragment();
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.setCustomAnimations(R.anim.left_in, R.anim.left_out);
-                    fragmentTransaction.replace(R.id.fragment_container, fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+
                 }
             }
 
@@ -113,7 +112,7 @@ public class SetPasswordFragmentUser extends Fragment {
     public void dataSendToServer(String id, final String password) {
 
 
-
+        progressDialog.showProgress();
         String hitURL = "http://bestinbd.com/projects/web/munshi/restAPI/site/save_password";
 
         HashMap<String, String> params = new HashMap<>();
@@ -126,7 +125,7 @@ public class SetPasswordFragmentUser extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
 
-
+                        progressDialog.hideProgress();
                         try {
                             int status = response.getInt("status");
                             if (status == 1) {
@@ -136,6 +135,16 @@ public class SetPasswordFragmentUser extends Fragment {
                                         response.getString("message"), Toast.LENGTH_SHORT).show();
 
                                 sessionManager.setPassword(password);
+                                Fragment fragment = new VerifyPhoneFragment();
+                                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                fragmentTransaction.setCustomAnimations(R.anim.left_in, R.anim.left_out);
+                                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                                fragmentTransaction.addToBackStack(null);
+                                fragmentTransaction.commit();
+                            }
+                            else{
+                                errorDialog.showDialog("Error!","Try Again Later");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -145,6 +154,7 @@ public class SetPasswordFragmentUser extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
+                        progressDialog.hideProgress();
                         d(TAG, "Error: " + volleyError.getMessage());
 
                         if (volleyError instanceof NetworkError) {

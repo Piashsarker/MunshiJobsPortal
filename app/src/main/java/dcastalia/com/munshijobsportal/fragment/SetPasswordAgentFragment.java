@@ -37,6 +37,8 @@ import java.util.HashMap;
 import dcastalia.com.munshijobsportal.Controller.AppController;
 import dcastalia.com.munshijobsportal.ErrorDialog;
 import dcastalia.com.munshijobsportal.Model.Agent;
+import dcastalia.com.munshijobsportal.PasswordValidator;
+import dcastalia.com.munshijobsportal.ProgressDialog;
 import dcastalia.com.munshijobsportal.R;
 import dcastalia.com.munshijobsportal.Util.VolleyCustomRequest;
 import dcastalia.com.munshijobsportal.sessionmanager.SessionManager;
@@ -56,8 +58,11 @@ public class SetPasswordAgentFragment extends  Fragment{
     Spinner spinnerAgent ;
     String spinnerAgentType ;
     ArrayList<Agent> agentArrayList;
+
     private static  final String AGENT_URL = "http://bestinbd.com/projects/web/munshi/restAPI/site/agentlist";
     ErrorDialog errorDialog ;
+    PasswordValidator passwordValidator ;
+    ProgressDialog progressDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +71,8 @@ public class SetPasswordAgentFragment extends  Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.set_password_agent_fragment, container, false);
 
+        progressDialog = new ProgressDialog(getContext());
+        passwordValidator = new PasswordValidator();
         sessionManager = new SessionManager(getContext());
         errorDialog = new ErrorDialog(getContext());
         input_password = (EditText) view.findViewById(R.id.input_password);
@@ -107,11 +114,11 @@ public class SetPasswordAgentFragment extends  Fragment{
 
 
 
-                if (input_password.getText().toString().length() == 0) {
-                    input_password.setError("Please enter password");
+                if (!passwordValidator.validate(password)) {
+                    input_password.setError("6 Character & One Uppercase Letter Required");
                     input_password.requestFocus();
-                } else if (input_confirm_password.getText().toString().length() == 0) {
-                    input_confirm_password.setError("Please confirm your password");
+                } else if (!passwordValidator.validate(repassword)) {
+                    input_confirm_password.setError("6 Character & One Uppercase Letter Required");
                     input_confirm_password.requestFocus();
                 } else if (!checkPassWordAndConfirmPassword(password, repassword)) {
 
@@ -119,15 +126,8 @@ public class SetPasswordAgentFragment extends  Fragment{
                 } else {
 
                     dataSendToServer(sessionManager.getUserId(), password,spinnerAgentType);
-                    sessionManager.setPassword(password);
 
-                    Fragment fragment = new VerifyPhoneFragment();
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.setCustomAnimations(R.anim.left_in, R.anim.left_out);
-                    fragmentTransaction.replace(R.id.fragment_container, fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+
                 }
             }
 
@@ -162,7 +162,7 @@ public class SetPasswordAgentFragment extends  Fragment{
 
     public void dataSendToServer(String id, final String password,String spinnerAgentType) {
 
-
+        progressDialog.showProgress();
 
         String hitURL = "http://bestinbd.com/projects/web/munshi/restAPI/site/save_password";
 
@@ -180,12 +180,25 @@ public class SetPasswordAgentFragment extends  Fragment{
                             int status = response.getInt("status");
                             if (status == 1) {
 
+                                progressDialog.hideProgress();
                                 Toast.makeText(getContext(),
                                         response.getString("message"), Toast.LENGTH_SHORT).show();
                                 sessionManager.setPassword(password);
+                                Fragment fragment = new VerifyPhoneFragment();
+                                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                fragmentTransaction.setCustomAnimations(R.anim.left_in, R.anim.left_out);
+                                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                                fragmentTransaction.addToBackStack(null);
+                                fragmentTransaction.commit();
+                            }
+                            else{
+                                progressDialog.hideProgress();
+                                errorDialog.showDialog("Error!","Try Again Later");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            progressDialog.hideProgress();
                             errorDialog.showDialog("Error!","Try Again Later.");
                         }
                     }
@@ -193,6 +206,7 @@ public class SetPasswordAgentFragment extends  Fragment{
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
+                        progressDialog.hideProgress();
                         d(TAG, "Error: " + volleyError.getMessage());
 
                         if (volleyError instanceof NetworkError) {

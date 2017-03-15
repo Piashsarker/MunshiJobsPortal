@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Munshi Jobs</string>
+    <string name="app_name">MEL Jobs</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -17,4 +17,16 @@
     <string name="select_salary_range">Select Salary Range</string>
     <string name="help_text">For any kind of help and query click  below number.</string>
     <string name="help_phone_number">01688503233</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_phone">Phone</string>
+    <string name="err_msg_name">Enter Name</string>
+    <string name="err_msg_phone">Phone Not Valid</string>
+    <string name="err_msg_email">Enter Valid Email</string>
+    <string name="err_msg_passport">Passport Not Valid</string>
+    <string name="hint_profession">Profession</string>
+    <string name="hint_passport">Passport No</string>
+    <string name="hint_nid">NID</string>
+    <string name="hint_address">Address</string>
+    <string name="hint_username">Enter Username</string>
 </resources>

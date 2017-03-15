@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
 
         HashMap<String , String> userDetails = sessionManager.getUserDetails();
 
-        if(userDetails.get(sessionManager.KEY_PHONE).equals(phone) && userDetails.get(sessionManager.KEY_PASSWORD).equals(password)){
+        if(userDetails.get(SessionManager.KEY_PHONE).equals(phone) && userDetails.get(SessionManager.KEY_PASSWORD).equals(password)){
             Intent intent = new Intent(LoginActivity.this , MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
